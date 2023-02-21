@@ -5,14 +5,12 @@ namespace DbOtusConsole.Data;
 
 public class DataContext : DbContext
 {
-    public DbSet<User> Users { get; set; }
-    public DbSet<Product> Products { get; set; }
-    
-    public DataContext(DbContextOptions<DataContext> options): base(options) { }
+    public DbSet<User> Users { get; set; } = null!;
+    public DbSet<Product> Products { get; set; } = null!;
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseNpgsql("User ID=postgres;Port=5432;Host=localhost;Password=123;Database=otus");
+        optionsBuilder.UseNpgsql("Username=postgres;Port=5432;Host=localhost;Password=123;Database=otus");
         base.OnConfiguring(optionsBuilder);
     }
 
@@ -32,7 +30,7 @@ public class DataContext : DbContext
 
         modelBuilder.Entity<Product>(opt =>
         {
-            opt.ToTable("produscts")
+            opt.ToTable("products")
                 .HasKey(x => x.Id);
             opt.Property(x => x.Id).HasColumnName("id");
             opt.Property(x => x.Title).HasColumnName("title")
@@ -42,16 +40,10 @@ public class DataContext : DbContext
             opt.Property(x => x.Price).HasColumnName("price");
 
             opt.HasOne(u => u.User)
-                .WithMany(p => p.Products);
+                .WithMany(p => p.Products)
+                .OnDelete(deleteBehavior: DeleteBehavior.Cascade);
         });
             
-            
-
-
-
-
-
-
         base.OnModelCreating(modelBuilder);
     }
 }
